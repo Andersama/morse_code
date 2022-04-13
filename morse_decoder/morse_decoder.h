@@ -499,12 +499,65 @@ size_t encode_morse_length(const morse_string& str) {
 	return ret;
 }
 
+size_t decode_morse_length(const morse_string& str) {
+	size_t ret = 0;
+
+	if (str.is_dots_and_dashes) {
+		//done already as dots and dashes
+		size_t i = 0;
+		for (size_t i = 0; i < str.buf.size();) {
+			uint8_t decoded_id = 36;
+
+			const char* matched = nullptr;
+			size_t matched_sz = 0;
+
+			for (size_t match_idx = 0; match_idx < 38; match_idx++) {
+				const char* ptr = morse_strings[match_idx];
+				size_t sz = morse_string_lengths[match_idx];
+				size_t i2 = i;
+				// only check for longer (better) matches
+				if (sz > matched_sz) {
+					bool is_matched = true;
+					size_t m = 0;
+					for (; m < sz && i2 < str.buf.size(); m++, i2++) {
+						is_matched = is_matched && (ptr[m] == str.buf[i2]);
+					}
+					is_matched = is_matched && m == sz;
+					if (is_matched) {
+						matched = ptr;
+						matched_sz = sz;
+						decoded_id = match_idx;
+					}
+				}
+			}
+
+			if (matched) {
+				i += matched_sz;
+				ret += morse_letterings_lengths[decoded_id];
+			}
+			else {
+				//nonsense pattern
+				break;
+			}
+		}
+
+		return ret;
+	}
+	else {
+		//encode
+		return ret = str.buf.size();
+	}
+
+	return ret;
+}
+
 morse_string encode_morse(const morse_string& str) {
 	morse_string ret = str;
 
 	if (ret.is_dots_and_dashes) {
 		//done already as dots and dashes
-	} else {
+	}
+	else {
 		ret.buf.clear();
 		//reserve exactly enough
 		ret.buf.reserve(encode_morse_length(str));
@@ -534,7 +587,7 @@ morse_string encode_morse(const morse_string& str) {
 	return ret;
 }
 
-morse_string decode_morse(const morse_string &dots_and_dashes) {
+morse_string decode_morse(const morse_string& dots_and_dashes) {
 	morse_string ret = dots_and_dashes;
 
 	if (dots_and_dashes.is_dots_and_dashes) {
@@ -570,18 +623,20 @@ morse_string decode_morse(const morse_string &dots_and_dashes) {
 			if (matched) {
 				ret.buf.append(morse_letterings[decoded_id], morse_letterings_lengths[decoded_id]);
 				i += matched_sz;
-			} else {
+			}
+			else {
 				break;
 			}
 		}
-	} else {
+	}
+	else {
 		// done already as dots and dashes
 	}
 
 	return ret;
 }
 
-bool validate_morse(morse_string str) {
+bool validate_morse(const morse_string &str) {
 	bool ret = true;
 	if (str.is_dots_and_dashes) {
 		size_t i = 0;
@@ -613,7 +668,8 @@ bool validate_morse(morse_string str) {
 
 			if (matched) {
 				i += matched_sz;
-			} else {
+			}
+			else {
 				//nonsense pattern
 				ret = false;
 				break;
