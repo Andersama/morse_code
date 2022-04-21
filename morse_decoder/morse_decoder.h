@@ -299,7 +299,7 @@ CXX_CONSTEXPR size_t custom_strlen(const char* ptr) noexcept {
 	return sz;
 }
 //
-CXX_CONSTEXPR char* morse_strings[38] = {
+CXX_CONSTEXPR const char* morse_strings[38] = {
 	"* ___", //a
 	"___ * * *", //b 
 	"___ * ___ *", //c
@@ -309,15 +309,15 @@ CXX_CONSTEXPR char* morse_strings[38] = {
 	"___ ___ *", //g
 	"* * * *", //h
 	"* *", //i
-	"* ___ ___ __", //j
+	"* ___ ___ ___", //j
 	"___ * ___", //k
 	"* ___ * *", //l
 	"___ ___", //m
 	"___ *", //n
 	"___ ___ ___", //o
 	"* ___ ___ *", //p
-	"___ __ * ___", //q
-	"* __ *", //r
+	"___ ___ * ___", //q
+	"* ___ *", //r
 	"* * *", //s
 	"___", //t
 	"* * ___", //u
